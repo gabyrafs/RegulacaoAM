@@ -1,0 +1,45 @@
+{
+  "name": "orbita-regulacao",
+  "version": "0.1.0",
+  "description": "Órbita Regulação - Apoio à regulação oftalmológica (protótipo)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js 3000",
+    "dev": "node server.js 3000 -- --watch",
+    "build": "echo 'Arquivos já estão em assets/ (pré-compilados do Vite)'",
+    "test": "node test-integration.js",
+    "lint": "echo 'Configure seu linter aqui'",
+    "precommit": "npm run test && npm run lint"
+  },
+  "keywords": [
+    "regulacao",
+    "oftalmologia",
+    "sisreg",
+    "saude",
+    "amazonas"
+  ],
+  "author": "Gabryel Rossi (gabyrafs)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gabyrafs/RegulacaoAM.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "optionalDependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5"
+  },
+  "browserslist": [
+    "> 0.5%",
+    "last 2 versions",
+    "Firefox ESR",
+    "not dead",
+    "not IE 11"
+  ]
+}

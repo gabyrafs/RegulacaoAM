@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Órbita Regulação</title>
+    <style>
+      :root {
+        --bg: #f4f6f8;
+        --panel: #ffffff;
+        --panel-alt: #eef2f6;
+        --text: #1f2937;
+        --muted: #667085;
+        --line: #dfe5eb;
+        --primary: #503f8c;
+        --primary-soft: #efe9ff;
+        --success: #0b7b5c;
+        --warning: #b86d00;
+        --danger: #b42318;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--text); }
+      body { min-height: 100vh; }
+
+      .topbar {
+        background: #f5f5f5;
+        border-bottom: 1px solid var(--line);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem;
+      }
+      .brand-mark {
+        width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center;
+        background: var(--primary); color: white; font-size: 12px; font-weight: bold;
+      }
+
+      .shell {
+        max-width: 1180px; margin: 26px auto; padding: 0 18px 32px;
+      }
+
+      .notice {
+        background: #eaf3fd; border: 1px solid #bfd8f5; color: #224a75; border-radius: 10px; padding: 14px 16px;
+        display: flex; align-items: center; gap: 10px; margin-bottom: 22px;
+      }
+
+      .grid {
+        display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 22px;
+      }
+
+      .card {
+        background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px;
+        box-shadow: 0 1px 0 rgba(17, 24, 39, 0.02);
+      }
+
+      h1 {
+        margin: 0 0 8px; font-size: clamp(2rem, 2.7vw, 3rem); line-height: 1.1;
+      }
+
+      h2 {
+        margin: 0 0 14px; font-size: 1.15rem; color: var(--text);
+      }
+
+      textarea {
+        width: 100%; min-height: 270px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        font-size: 0.92rem; line-height: 1.5; font-family: "JetBrains Mono", Consolas, monospace; background: #fbfcfe;
+      }
+
+      .actions {
+        display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px;
+      }
+
+      button {
+        appearance: none; border: none; border-radius: 10px; background: var(--primary); color: white; cursor: pointer;
+        font-weight: 700; padding: 11px 16px; transition: opacity 0.2s ease;
+      }
+      button:hover { opacity: 0.96; }
+      button.secondary {
+        background: #edf2f7; color: var(--text); border: 1px solid var(--line);
+      }
+      button.danger {
+        background: #fff0f1; border: 1px solid #f0c8c8; color: var(--danger);
+      }
+
+      .summary {
+        display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;
+        margin-top: 18px;
+      }
+
+      .metric {
+        background: var(--panel-alt); border: 1px solid var(--line); border-radius: 12px; padding: 16px;
+      }
+      .metric .label {
+        display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+      }
+      .metric .value {
+        font-size: clamp(1.8rem, 2vw, 2.3rem); font-weight: 800; color: var(--text);
+      }
+
+      .meta {
+        margin-top: 20px; color: var(--muted); font-size: 0.9rem; line-height: 1.6;
+      }
+
+      .field-list {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 18px;
+      }
+
+      .field {
+        background: #f7f8fa; border: 1px solid var(--line); border-radius: 10px; padding: 12px 10px;
+      }
+      .field .k {
+        font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block;
+      }
+      .field .v {
+        font-weight: 700; word-break: break-word;
+      }
+
+      .status {
+        margin-top: 12px; background: #f4f7f9; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; color: var(--text);
+      }
+      .status.error { background: #fff4f3; border-color: #f0c8c8; color: var(--danger); }
+      .status.success { background: #edfaf6; border-color: #bfead8; color: var(--success); }
+
+      @media (max-width: 900px) {
+        .grid { grid-template-columns: 1fr; }
+        .summary { grid-template-columns: 1fr 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">◉</span>
+        <span>Órbita Regulação</span>
+      </div>
+    </header>
+
+    <main class="shell">
+      <div class="notice">ℹ️ Cole o pacote JSON capturado pela extensão SISREG para analisar campos reais.</div>
+
+      <div class="grid">
+        <section class="card">
+          <h1>Integração SISREG</h1>
+          <textarea id="jsonInput" placeholder="Cole aqui o JSON do SISREG, por exemplo:
+{
+  "origem": "sisreg-extension",
+  "campos": {
+    "codigoSolicitacao": "12345",
+    "cid": "H35.31",
+    "avSemOD": "20/200",
+    "avSemOE": "20/40",
+    "pioOD": "15 mmHg",
+    "pioOE": "16 mmHg"
+  }
+}
+"></textarea>
+          <div class="actions">
+            <button id="loadJson">Carregar pacote</button>
+            <button class="secondary" id="demoJson">Usar exemplo</button>
+            <button class="danger" id="clearJson">Limpar</button>
+          </div>
+          <div id="status" class="status">Aguardando pacote SISREG.</div>
+        </section>
+
+        <aside class="card">
+          <h2>Resumo da solicitação</h2>
+          <div class="summary">
+            <div class="metric">
+              <span class="label">Solicitação</span>
+              <span id="codigoSolicitacao" class="value">—</span>
+            </div>
+            <div class="metric">
+              <span class="label">CID</span>
+              <span id="cid" class="value">—</span>
+            </div>
+            <div class="metric">
+              <span class="label">AV OD</span>
+              <span id="avSemOD" class="value">—</span>
+            </div>
+            <div class="metric">
+              <span class="label">AV OE</span>
+              <span id="avSemOE" class="value">—</span>
+            </div>
+          </div>
+          <div class="meta">
+            Este painel aceita o JSON gerado pela extensão e exibe somente os campos permitidos para revisão clínica.
+          </div>
+        </aside>
+      </div>
+
+      <section class="card" style="margin-top: 22px;">
+        <h2>Dados completos da solicitação</h2>
+        <textarea id="solicitacaoCompleta" readonly placeholder="O pacote completo da solicitação será exibido aqui." style="min-height: 180px; background: #f8fafc;"></textarea>
+      </section>
+
+      <section class="card" style="margin-top: 22px;">
+        <h2>Campos capturados</h2>
+        <div id="fieldList" class="field-list"></div>
+      </section>
+    </main>
+
+    <script>
+      const fieldNames = [
+        'codigoSolicitacao', 'cid', 'classificacaoRisco', 'situacao', 'dataSolicitacao',
+        'avSemOD', 'avSemOE', 'avComOD', 'avComOE', 'pioOD', 'pioOE',
+        'descricaoProcedimento', 'cnesSolicitante', 'cnesExecutante', 'codigoUnificado',
+        'codigoInterno', 'justificativaClinica', 'nomePaciente', 'municipio',
+        'origemSolicitacao', 'medicoSolicitante', 'procedimento', 'status'
+      ];
+
+      const jsonInput = document.getElementById('jsonInput');
+      const statusEl = document.getElementById('status');
+      const fieldList = document.getElementById('fieldList');
+      const solicitacaoCompletaEl = document.getElementById('solicitacaoCompleta');
+
+      function setStatus(message, kind = '') {
+        statusEl.textContent = message;
+        statusEl.className = 'status';
+        if (kind) statusEl.classList.add(kind);
+      }
+
+      function normalizeCampos(obj) {
+        if (!obj || typeof obj !== 'object') return {};
+
+        const entries = Object.entries(obj).reduce((acc, [key, value]) => {
+          if (value === null || value === undefined || value === '') return acc;
+          if (typeof value === 'object' && !Array.isArray(value)) {
+            Object.assign(acc, normalizeCampos(value));
+          } else if (Array.isArray(value)) {
+            const flat = value.filter((item) => item !== null && item !== undefined && String(item).trim());
+            if (flat.length) acc[key] = flat.join('; ');
+          } else {
+            acc[key] = String(value).trim();
+          }
+          return acc;
+        }, {});
+
+        return entries;
+      }
+
+      function parsePayload(rawText) {
+        const text = (rawText || '').trim();
+        if (!text) throw new Error('Cole o JSON da extensão antes de continuar.');
+
+        const parsed = JSON.parse(text);
+        const pacote = parsed?.pacote || parsed;
+        const campos = normalizeCampos(pacote?.campos || parsed?.campos || pacote || parsed || {});
+
+        if (!campos || typeof campos !== 'object' || Object.keys(campos).length === 0) {
+          throw new Error('JSON encontrado, mas sem campos válidos para leitura.');
+        }
+
+        return { pacote, campos };
+      }
+
+      function renderCampos(campos) {
+        const entries = Object.entries(campos).filter(([key, value]) => {
+          const text = String(value ?? '').trim();
+          return text.length > 0 && (fieldNames.includes(key) || /^codigo|^cid|^av|^pio|^situ|^data|^cnes|^descricao|^justificativa|^nome|^municipio|^origem|^medico|^procedimento|^status/.test(key));
+        });
+
+        fieldList.innerHTML = '';
+
+        if (!entries.length) {
+          fieldList.innerHTML = '<div class="field"><span class="k">Status</span><span class="v">Nenhum campo válido encontrado.</span></div>';
+          return;
+        }
+
+        for (const [key, value] of entries) {
+          const el = document.createElement('div');
+          el.className = 'field';
+          el.innerHTML = `<span class="k">${key}</span><span class="v">${String(value)}</span>`;
+          fieldList.appendChild(el);
+        }
+      }
+
+      function renderSummary(campos) {
+        const map = (key, fallback = '—') => {
+          const val = campos[key];
+          return val ? String(val) : fallback;
+        };
+
+        document.getElementById('codigoSolicitacao').textContent = map('codigoSolicitacao');
+        document.getElementById('cid').textContent = map('cid');
+        document.getElementById('avSemOD').textContent = map('avSemOD');
+        document.getElementById('avSemOE').textContent = map('avSemOE');
+      }
+
+      function processJson() {
+        try {
+          const { pacote, campos } = parsePayload(jsonInput.value);
+          renderCampos(campos);
+          renderSummary(campos);
+          const pacoteCompleto = pacote && typeof pacote === 'object' ? pacote : { campos };
+          solicitacaoCompletaEl.value = JSON.stringify(pacoteCompleto, null, 2);
+          setStatus(`Pacote carregado com ${Object.keys(campos).length} campos válidos.`, 'success');
+        } catch (error) {
+          solicitacaoCompletaEl.value = '';
+          setStatus(error.message || 'Não foi possível ler o pacote.', 'error');
+        }
+      }
+
+      jsonInput.addEventListener('paste', () => setTimeout(processJson, 100));
+      jsonInput.addEventListener('input', () => {
+        if (jsonInput.value.trim().startsWith('{')) {
+          setTimeout(processJson, 150);
+        }
+      });
+
+      document.getElementById('loadJson').addEventListener('click', processJson);
+      document.getElementById('clearJson').addEventListener('click', () => {
+        jsonInput.value = '';
+        fieldList.innerHTML = '';
+        solicitacaoCompletaEl.value = '';
+        document.getElementById('codigoSolicitacao').textContent = '—';
+        document.getElementById('cid').textContent = '—';
+        document.getElementById('avSemOD').textContent = '—';
+        document.getElementById('avSemOE').textContent = '—';
+        setStatus('Aguardando pacote SISREG.');
+      });
+
+      document.getElementById('demoJson').addEventListener('click', () => {
+        jsonInput.value = JSON.stringify({
+          origem: 'sisreg-extension',
+          campos: {
+            codigoSolicitacao: '2025001234',
+            cid: 'H35.31',
+            classificacaoRisco: 'Baixo risco',
+            situacao: 'Em análise',
+            dataSolicitacao: '15/08/2026',
+            avSemOD: '20/200',
+            avSemOE: '20/40',
+            avComOD: '20/60',
+            avComOE: '20/25',
+            pioOD: '15 mmHg',
+            pioOE: '16 mmHg',
+            descricaoProcedimento: 'Consulta de rotina oftalmológica',
+            cnesSolicitante: '1234567',
+            cnesExecutante: '7654321',
+            codigoUnificado: 'OP-OT-001',
+            codigoInterno: 'SOL-001',
+            nomePaciente: 'Maria da Conceição',
+            municipio: 'Manaus',
+            origemSolicitacao: 'Sistema de Regulação',
+            medicoSolicitante: 'Dr. José Pereira',
+            procedimento: 'Exame de refração',
+            status: 'Em análise',
+            justificativaClinica: 'Paciente com avaliação oftalmológica em seguimento.'
+          }
+        }, null, 2);
+        processJson();
+      });
+
+      window.ORBITA_CONFIG = { isInIframe: window.self !== window.top, parentOrigin: null };
+      window.addEventListener('message', function(event) {
+        const allowedOrigins = ['https://sisregiii.saude.am.gov.br', 'http://localhost', 'http://127.0.0.1'];
+        if (!allowedOrigins.some(origin => event.origin.includes(origin))) return;
+        if (event.data && event.data.type === 'ORBITA_INIT') {
+          console.log('Órbita iniciando no contexto SISREG', event.data);
+        }
+      });
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,32 @@
+:root {
+  color-scheme: light dark;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: #f3f7f8;
+  color: #10252b;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+header { padding: 18px; border-bottom: 1px solid #cad8dc; background: #e7f0f2; }
+header p { margin: 4px 0 0; color: #4d646b; font-size: 12px; }
+.marca { color: #174f59; font-size: 20px; font-weight: 800; }
+main { display: grid; gap: 12px; padding: 16px; }
+.aviso { border-left: 4px solid #b56b00; background: #fff4dd; padding: 10px; font-size: 12px; line-height: 1.45; }
+.check { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; font-weight: 650; }
+.ajuda, .rodape { margin: -6px 0 0; color: #5d7076; font-size: 11px; line-height: 1.4; }
+button { border: 0; background: #174f59; color: #fff; padding: 10px 12px; font-weight: 700; cursor: pointer; }
+button.secundario { border: 1px solid #174f59; background: transparent; color: #174f59; }
+button:disabled { cursor: not-allowed; opacity: .5; }
+#estado { min-height: 36px; border: 1px solid #cad8dc; background: #fff; padding: 9px; font-size: 12px; }
+label[for="saida"] { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+textarea { min-height: 260px; resize: vertical; border: 1px solid #98afb5; background: #fff; color: #10252b; padding: 9px; font: 11px/1.45 ui-monospace, monospace; }
+
+@media (prefers-color-scheme: dark) {
+  :root { background: #0d1c20; color: #dcebed; }
+  header { background: #132a30; border-color: #284148; }
+  .marca { color: #74c4cf; }
+  header p, .ajuda, .rodape { color: #9cb0b5; }
+  .aviso { background: #3b2d12; color: #f0d7a1; }
+  #estado, textarea { background: #13272c; color: #dcebed; border-color: #38545b; }
+  button.secundario { color: #74c4cf; border-color: #74c4cf; }
+}
